@@ -1,0 +1,125 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="container">
+        {% if message %}
+            {% if updated %}
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Success!</h4>
+                <p>{{ message }}</p>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Failed!</h4>
+                <p>{{ message }}</p>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="container">
+    {% if not listing.isactive %}
+        {% if user != listing.owner %}
+            {% if winner and winner == user %}
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Congratulations!</h4>
+                    <p>Congrats! You won the auctions!</p>
+                </div>
+            {% elif winner and winner != user %}
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Try again next time!</h4>
+                    <p>Unfortunately, You've missed it!</p>
+                </div>
+            {% endif %}
+        {% else %}
+            {% if winner %}
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Congratulations!</h4>
+                    <p>Congrats! You sold the auctions!</p>
+                </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Try again next time!</h4>
+                    <p>Unfortunately, you've had no offers for your bid!</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    </div>
+    <h2>Listing: {{ listing.title }}</h2>
+    {% if user.is_authenticated and listing.isactive %}
+        {% if iswatchlist %}
+            <form action="{% url 'remove_watchlist' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Remove From Watchlist</button>
+            </form>
+        {% else %}
+        <form action="{% url 'add_watchlist' id=listing.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Add To Watchlist</button>
+        </form>
+        {% endif %}
+    {% endif %}
+    {% if listing.image_url %}
+        <img src="{{ listing.image_url }}" height="400" class="my-3">
+    {% endif %}
+    <p>{{ listing.description }}</p>
+    <h4>${{ listing.price }}</h4>
+    <div class="my-3">
+        {% if user.is_authenticated %}
+            {% if bid_counter > 0 %}
+                <small>{{ bid_counter }} bid(s) so far. {{ bid_message }}</small>
+            {% else %}
+                <small>No bids so far</small>
+            {% endif %}
+            {% if isowner and listing.isactive %}
+                <form action="{% url 'close_listing' id=listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">CLose Listing</button>
+                </form>
+            {% elif isowner and not listing.isactive %}
+                <h3>You have closed the listing.</h3>
+            {% elif not isowner and listing.isactive %}
+            <form action="{% url 'add_bid' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="number" min="0" name="bid" placeholder="Place Bid">
+                </div>
+                <button type="submit" class="btn btn-primary">Place Bid</button>
+            </form>
+            {% else %}
+                <h3>The owner had closed this listing.</h3>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="my-3">
+        <h3>Details</h3>
+        <ul>
+            <li>Listed by: {{ listing.owner }}</li>
+            {% if listing.category %}
+                <li>Category: {{ listing.category }}</li>
+            {% else %}
+                <li>Category: No Category Listed</li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="my-3">
+        <h3>Comments</h3>
+        {% if user.is_authenticated %}
+            <form action="{% url 'add_comments' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="new_comment" placeholder="Add comment"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add comment</button>
+            </form>
+        {% endif %}
+    </div>
+    <div class="list-group">
+        {% for comment in comments %}
+            <div class="list-group-item">
+                <p class="mb-1">{{ comment.message }}</p>
+                <small>--- Posted by: {{ comment.author }} on {{ comment.date }} ---</small>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Listings that I've placed bid(s)</h2>
+    <div class="row mx-3">
+        {% for listing in bid_listings %}
+        <div class="card mx-3" style="width: 18rem;">
+            {% if listing.image_url %}
+                <img class="card-img-top" src="{{ listing.image_url }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ listing.title }}</h5>
+                <p class="card-text">{{ listing.description }}</p>
+                <p class="card-text">${{ listing.price }}</p>
+                <p class="card-text"><small class="text-muted">Created on {{ listing.date }}</small></p>
+                <a href="{% url 'listings' id=listing.id %}" class="btn btn-primary">Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <br>
+    <h2>Listings that I've created</h2>
+    <div class="row mx-3">
+        {% for listing in owner_listings %}
+        <div class="card mx-3" style="width: 18rem;">
+            {% if listing.image_url %}
+                <img class="card-img-top" src="{{ listing.image_url }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ listing.title }}</h5>
+                <p class="card-text">{{ listing.description }}</p>
+                <p class="card-text">${{ listing.price }}</p>
+                <p class="card-text"><small class="text-muted">Created on {{ listing.date }}</small></p>
+                <a href="{% url 'listings' id=listing.id %}" class="btn btn-primary">Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
