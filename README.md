@@ -15,5 +15,16 @@ A fullstack e-commerce web application like eBay using Django Framework. The Auc
 
 ## How to run:
 
-* Install Django Framework: `pip install Django`
-* Run the app locally: `python manage.py runserver`
+* Install Django Framework:
+  ```
+  pip install Django
+  ```
+* Initialize the database:
+  ```
+  python manage.py makemigrations
+  python manage.py migrate
+  ```
+* Run the app locally:
+  ```
+  python manage.py runserver
+  ```
